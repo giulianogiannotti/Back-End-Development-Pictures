@@ -35,7 +35,9 @@ def count():
 ######################################################################
 @app.route("/picture", methods=["GET"])
 def get_pictures():
-    pass
+    if data:
+        return jsonify(data), 200
+    return {"message":"No data"}    
 
 ######################################################################
 # GET A PICTURE
@@ -44,15 +46,24 @@ def get_pictures():
 
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
-    pass
-
+    for picture in data:
+        if picture['id'] == id:
+            return picture, 200
+    return {"message": "No picture found"}, 404        
 
 ######################################################################
 # CREATE A PICTURE
 ######################################################################
 @app.route("/picture", methods=["POST"])
 def create_picture():
-    pass
+    picture = request.get_json()
+    if picture:
+        if picture not in data:
+            data.append(picture)
+            return jsonify(picture), 201
+        else:
+            return {"Message": f"picture with id {picture['id']} already present"}, 302    
+    return {"message": "Invalid input parameter"}, 404    
 
 ######################################################################
 # UPDATE A PICTURE
@@ -61,11 +72,21 @@ def create_picture():
 
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    info = request.get_json()
+    if info:
+        for picture in data:
+            if picture['id'] == id:
+                picture.update(info)
+                return jsonify(picture), 200
+    return {"message": "Picture not found"}, 404            
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
 def delete_picture(id):
-    pass
+    for picture in data:
+        if picture['id'] == id:
+            data.remove(picture)
+            return {"message": "Picture deleted"}, 204
+    return {"message": "Picture not found"}, 404        
